@@ -1,0 +1,77 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: install updates (Debian)
+    apt: 
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Debian"
+
+  - name: install updates (Pop!_OS)
+# Could be a dnf-based distro theoretically,
+# so the commands would be different
+    apt: 
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Pop!_OS"
+
+
+- hosts: web_servers
+  become: true
+  tasks:
+
+  - name: install apache and php for Debianserver
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Debian"
+
+  - name: install apache and php for LenovoTPT530
+# Could be a dnf-based distro theoretically,
+# so the package name would be different
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Pop!_OS"
+
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+  - name: install MariaDB for Debianserver
+    apt:
+      name:
+        - mariadb-server
+      state: latest
+    when: ansible_distribution == "Debian"
+
+  - name: install MariaDB for LenovoTPT530
+# Could be a dnf-based distro theoretically,
+# so the package name would be different
+    apt:
+      name:
+        - mariadb-server
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Pop!_OS"
+
+
+- hosts: file_servers
+  become: true
+  tasks:
+
+  - name: install samba
+# Package name is identically for both apt and dnf
+    package:
+      name:
+        - samba
+      state: latest
