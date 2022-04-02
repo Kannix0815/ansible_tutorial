@@ -5,12 +5,14 @@
   pre_tasks:
 
   - name: install updates (Debian)
+    tags: always
     apt: 
       upgrade: dist
       update_cache: yes
     when: ansible_distribution == "Debian"
 
   - name: install updates (Pop!_OS)
+    tags: always
 # Could be a dnf-based distro theoretically,
 # so the commands would be different
     apt: 
@@ -24,6 +26,7 @@
   tasks:
 
   - name: install apache and php for Debianserver
+    tags: apache,apache2,debian
     apt:
       name:
         - apache2
@@ -32,6 +35,7 @@
     when: ansible_distribution == "Debian"
 
   - name: install apache and php for LenovoTPT530
+    tags: apache,apache2,popos
 # Could be a dnf-based distro theoretically,
 # so the package name would be different
     apt:
@@ -48,6 +52,7 @@
   tasks:
 
   - name: install MariaDB for Debianserver
+    tags: db,mariadb,debian
     apt:
       name:
         - mariadb-server
@@ -55,6 +60,7 @@
     when: ansible_distribution == "Debian"
 
   - name: install MariaDB for LenovoTPT530
+    tags: db,mariadb,popos
 # Could be a dnf-based distro theoretically,
 # so the package name would be different
     apt:
@@ -70,6 +76,7 @@
   tasks:
 
   - name: install samba
+    tags: samba
 # Package name is identically for both apt and dnf
     package:
       name:
