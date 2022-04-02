@@ -9,6 +9,7 @@
     apt: 
       upgrade: dist
       update_cache: yes
+      state: latest
     when: ansible_distribution in ["Debian","Pop!_OS"]
 
   - name: install updates for FedoraWS-VM
@@ -16,6 +17,7 @@
     dnf: 
       update_only: yes
       update_cache: yes
+      state: latest
     when: ansible_distribution == "Fedora"
 
 
@@ -42,7 +44,7 @@
   tasks:
 
   - name: install apache and php for Debianserver-VM
-    tags: apache,apache2,debian
+    tags: apache,apache2,php,debian
     apt:
       name:
         - apache2
@@ -50,18 +52,22 @@
       state: latest
     when: ansible_distribution == "Debian"
 
-# Could be a dnf-based distro theoretically,
-# so the package name would be different.
-# Thats why an extra play here.
-  - name: install apache and php for LenovoTPT530
-    tags: apache,apache2,popos
-    apt:
+  - name: install apache and php for FedoraWS-VM
+    tags: apache,httpd,php,fedora
+    dnf:
       name:
-        - apache2
-        - libapache2-mod-php
+        - httpd
+        - php
       state: latest
-      update_cache: yes
-    when: ansible_distribution == "Pop!_OS"
+    when: ansible_distribution == "Fedora"
+
+  - name: start httpd for FedoraWS-VM
+    tags: apache,httpd,fedora
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+    when: ansible_distribution == "Fedora"
 
   - name: copy default html file for site
     tags: apache,apache2,debian,popos
