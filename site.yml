@@ -69,6 +69,24 @@
       enabled: yes
     when: ansible_distribution == "Fedora"
 
+  - name: change email-address for admin
+    tags: apache,httpd,fedora
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regexp: '^ServerAdmin'
+      line: ServerAdmin somebody@somewhere.net
+    when: ansible_distribution == "Fedora"
+# It is not important how this register value is called.
+# It only has to match the value in front of the .changed in the next play.
+    register: httpd
+
+  - name: restart httpd on FedoraWS-VM
+    tags: apache,httpd,fedora
+    service:
+      name: httpd
+      state: restarted
+    when: httpd.changed
+
   - name: copy default html file for site
     tags: apache,apache2,debian,popos
     copy:
