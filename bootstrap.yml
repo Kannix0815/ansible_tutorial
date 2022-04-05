@@ -1,0 +1,47 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: install updates for Debianserver-VM and LenovoTPT530
+    tags: always
+    apt: 
+      upgrade: dist
+      update_cache: yes
+      state: latest
+    when: ansible_distribution in ["Debian","Pop!_OS"]
+
+  - name: install updates for FedoraWS-VM
+    tags: always
+    dnf: 
+      update_only: yes
+      update_cache: yes
+      state: latest
+    when: ansible_distribution == "Fedora"
+
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: create simone user for ansible usage
+    tags: always
+    user:
+      name: simone
+      groups: root
+
+  - name: add ssh-key for simone
+    tags: always
+    authorized_key:
+      user: simone
+      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPPgGlp7llA/gBTkOSpQtmfmY4pbUTmhgoDf6JO9Aq9G ansible"
+
+  - name: add sudoers file for simone
+    tags: always
+    copy:
+      src: sudoer_simone
+      dest: /etc/sudoers.d/simone
+      owner: root
+      group: root
+      mode: 0440
