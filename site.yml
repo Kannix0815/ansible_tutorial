@@ -21,126 +21,25 @@
 
 - hosts: all
   become: true
-  pre_tasks:
-
-# Placeholder for further ssh key management
-  - name: add ssh-key for simone
-    tags: always
-    authorized_key:
-      user: simone
-      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPPgGlp7llA/gBTkOSpQtmfmY4pbUTmhgoDf6JO9Aq9G ansible"
-
+  roles:
+    - base
 
 - hosts: workstations
   become: true
-  tasks:
-
-    - name: install unzip
-      package:
-        name: unzip
-
-    - name: install terraform
-      unarchive:
-        src: https://releases.hashicorp.com/terraform/1.1.7/terraform_1.1.7_linux_amd64.zip
-        dest: /usr/local/bin
-        remote_src: yes
-        mode: 0755
-        owner: root
-        group: root
-
+  roles:
+    - workstations
 
 - hosts: web_servers
   become: true
-  tasks:
-
-  - name: install apache and php for Debianserver-VM
-    tags: apache,apache2,php,debian
-    apt:
-      name:
-        - apache2
-        - libapache2-mod-php
-      state: latest
-    when: ansible_distribution == "Debian"
-
-  - name: install apache and php for FedoraWS-VM
-    tags: apache,httpd,php,fedora
-    dnf:
-      name:
-        - httpd
-        - php
-      state: latest
-    when: ansible_distribution == "Fedora"
-
-  - name: start httpd for FedoraWS-VM
-    tags: apache,httpd,fedora
-    service:
-      name: httpd
-      state: started
-      enabled: yes
-    when: ansible_distribution == "Fedora"
-
-  - name: change email-address for admin
-    tags: apache,httpd,fedora
-    lineinfile:
-      path: /etc/httpd/conf/httpd.conf
-      regexp: '^ServerAdmin'
-      line: ServerAdmin somebody@somewhere.net
-    when: ansible_distribution == "Fedora"
-# It is not important how this register value is called.
-# It only has to match the value in front of the .changed in the next play.
-# If we have more changes, we have to use different register names!
-    register: httpd
-
-  - name: restart httpd on FedoraWS-VM
-    tags: apache,httpd,fedora
-    service:
-      name: httpd
-      state: restarted
-    when: httpd.changed
-
-  - name: copy default html file for site
-    tags: apache,apache2,debian,popos
-    copy:
-      src: default_site.html
-      dest: /var/www/html/index.html
-      owner: root
-      group: root
-      mode: 0644
-
+  roles:
+    - web_servers
 
 - hosts: db_servers
   become: true
-  tasks:
-
-  - name: install MariaDB for Debianserver-VM
-    tags: db,mariadb,debian
-    apt:
-      name:
-        - mariadb-server
-      state: latest
-    when: ansible_distribution == "Debian"
-
-# Could be a dnf-based distro theoretically,
-# so the package name would be different.
-# Thats why an extra play here.
-  - name: install MariaDB for LenovoTPT530
-    tags: db,mariadb,popos
-    apt:
-      name:
-        - mariadb-server
-      state: latest
-      update_cache: yes
-    when: ansible_distribution == "Pop!_OS"
-
+  roles:
+    - db_servers
 
 - hosts: file_servers
   become: true
-  tasks:
-
-  - name: install samba
-    tags: samba
-# Package name is identically for both apt and dnf
-    package:
-      name:
-        - samba
-      state: latest
+  roles:
+    - file_servers

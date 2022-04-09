@@ -1,0 +1,19 @@
+- name: install MariaDB for Debianserver-VM
+  tags: db,mariadb,debian
+  apt:
+    name:
+      - mariadb-server
+    state: latest
+  when: ansible_distribution == "Debian"
+
+# Could be a dnf-based distro theoretically,
+# so the package name would be different.
+# Thats why an extra play here.
+- name: install MariaDB for LenovoTPT530
+  tags: db,mariadb,popos
+  apt:
+    name:
+      - mariadb-server
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "Pop!_OS"

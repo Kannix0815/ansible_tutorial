@@ -1,0 +1,7 @@
+- name: install samba
+  tags: samba
+# Package name is identically for both apt and dnf
+  package:
+    name:
+      - samba
+    state: latest
