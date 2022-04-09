@@ -4,26 +4,42 @@
   become: true
   pre_tasks:
 
-  - name: install updates for Debianserver-VM and LenovoTPT530
+  - name: install updates for Debian based hosts
     tags: always
     apt: 
       upgrade: dist
       update_cache: yes
-      state: latest
-    when: ansible_distribution in ["Debian","Pop!_OS"]
+#    when: ansible_distribution in ["Debian","Pop!_OS","Linux Mint"]
+    when: ansible_facts['os_family'] == "Debian"
+
+  - name: Remove packages not needed anymore for Debian based hosts
+    apt:
+      autoremove: yes
+#    when: ansible_distribution in ["Debian","Pop!_OS","Linux Mint"]
+    when: ansible_facts['os_family'] == "Debian"
 
   - name: install updates for FedoraWS-VM
     tags: always
     dnf: 
       update_only: yes
       update_cache: yes
-      state: latest
     when: ansible_distribution == "Fedora"
 
+  - name: Remove packages not needed anymore for FedoraWS-VM
+    dnf:
+      autoremove: yes
+    when: ansible_distribution == "Fedora"
+
+  - name: install updates for Arch based hosts
+    tags: always
+    community.general.pacman:
+      update_cache: yes
+      upgrade: yes
+    when: ansible_facts['os_family'] == "Archlinux"
 
 - hosts: all
   become: true
-  pre_tasks:
+  tasks:
 
   - name: create simone user for ansible usage
     tags: always
