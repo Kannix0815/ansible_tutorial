@@ -1,50 +1,29 @@
-- name: install apache and php for Debianserver-VM
-  tags: apache,apache2,php,debian
-  apt:
+- name: install apache and php packages
+  tags: apache,apache2,fedora,http,php,ubuntu
+  package:
     name:
-      - apache2
-      - libapache2-mod-php
+      - "{{ apache_package_name }}"
+      - "{{ apache_service }}"
     state: latest
-  when: ansible_distribution == "Debian"
 
-- name: install apache and php for FedoraWS-VM
-  tags: apache,httpd,php,fedora
-  dnf:
-    name:
-      - httpd
-      - php
-    state: latest
-  when: ansible_distribution == "Fedora"
-
-- name: start httpd for FedoraWS-VM
-  tags: apache,httpd,fedora
+- name: start and enable apache service
+  tags: apache,fedora,httpd
   service:
-    name: httpd
+    name: "{{ apache_service }}"
     state: started
     enabled: yes
-  when: ansible_distribution == "Fedora"
 
 - name: change email-address for admin
-  tags: apache,httpd,fedora
+  tags: apache,fedora,httpd
   lineinfile:
     path: /etc/httpd/conf/httpd.conf
     regexp: '^ServerAdmin'
-    line: ServerAdmin somebody@somewhere.net
+    line: ServerAdmin somebody@somewhere.org
   when: ansible_distribution == "Fedora"
-# It is not important how this register value is called.
-# It only has to match the value in front of the .changed in the next play.
-# If we have more changes, we have to use different register names!
-  register: httpd
-
-- name: restart httpd on FedoraWS-VM
-  tags: apache,httpd,fedora
-  service:
-    name: httpd
-    state: restarted
-  when: httpd.changed
+  notify: restart_apache
 
 - name: copy default html file for site
-  tags: apache,apache2,debian,popos
+  tags: apache,apache2,debian,fedora
   copy:
     src: default_site.html
     dest: /var/www/html/index.html
