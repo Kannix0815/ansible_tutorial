@@ -1,16 +1,19 @@
 [web_servers]
 debianserver
 fedora
+ubuntuserver
 
 [db_servers]
 debianserver
 lenovotpt530
+ubuntuserver
 
 [file_servers]
-lenovotpt530
+ubuntuserver
 
 [workstations]
 fedora
 mint
 mx
 endeavour
+lenovotpt530
