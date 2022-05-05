@@ -4,7 +4,8 @@
     name:
       - mariadb-server
     state: latest
-  when: ansible_distribution == "Debian"
+#  when: ansible_distribution == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
 
 # Could be a dnf-based distro theoretically,
 # so the package name would be different.

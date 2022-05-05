@@ -20,6 +20,7 @@
     regexp: '^ServerAdmin'
     line: ServerAdmin somebody@somewhere.org
   when: ansible_distribution == "Fedora"
+#  when: ansible_facts['os_family'] == "Debian"
   notify: restart_apache
 
 - name: copy default html file for site
